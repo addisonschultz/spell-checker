@@ -11,40 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install Spell Checker
-      run: npm install -g markdown-spellcheck
+      - name: Install Spell Checker
+        run: npm install -g markdown-spellcheck
 
-    - name: Find Markdown Files
-      id: find_files
-      run: |
-        files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$' || true)
-        echo "::set-output name=files::$files"
+      - name: Find Markdown Files
+        id: find_files
+        run: |
+          files=$(find . -type f -name '*.md')
+          echo "::set-output name=files::$files"
 
-    - name: Run Spell Checker
-      if: steps.find_files.outputs.files != ''
-      run: mdspell --en-us --report ${{ steps.find_files.outputs.files }} > result.txt || true
+      - name: Run Spell Checker
+        if: steps.find_files.outputs.files != ''
+        run: mdspell --en-us --report ${{ steps.find_files.outputs.files }} > result.txt || true
 
-    - name: Check for Spelling Errors
-      id: check_errors
-      run: |
-        if [ -s result.txt ]; then
-          echo "::set-output name=errors::true"
-        else
-          echo "::set-output name=errors::false"
-        fi
+      - name: Check for Spelling Errors
+        id: check_errors
+        run: |
+          if [ -s result.txt ]; then
+            echo "::set-output name=errors::true"
+          else
+            echo "::set-output name=errors::false"
+          fi
 
-    - name: Post Comment on PR
-      if: steps.check_errors.outputs.errors == 'true'
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          Spelling errors found in the following files:
-          ```
-          ${{ steps.find_files.outputs.files }}
-          ```
-          Please fix the errors and update the PR.
+      - name: Post Comment on PR
+        if: steps.check_errors.outputs.errors == 'true'
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Spelling errors found in the following files:
+            ```
+            ${{ steps.find_files.outputs.files }}
+            ```
+            Please fix the errors and update the PR.
