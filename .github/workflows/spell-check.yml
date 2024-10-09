@@ -41,16 +41,3 @@ jobs:
         run: |
           echo "Spelling errors found:"
           cat result.txt
-
-      - name: Post Comment on PR
-        if: steps.check_errors.outputs.errors == 'true'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            Spelling errors found in the following files:
-            ```
-            ${{ steps.find_files.outputs.files }}
-            ```
-            Please fix the errors and update the PR.
