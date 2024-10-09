@@ -36,6 +36,12 @@ jobs:
             echo "::set-output name=errors::false"
           fi
 
+      - name: Log Spelling Errors
+        if: steps.check_errors.outputs.errors == 'true'
+        run: |
+          echo "Spelling errors found:"
+          cat result.txt
+
       - name: Post Comment on PR
         if: steps.check_errors.outputs.errors == 'true'
         uses: peter-evans/create-or-update-comment@v1
