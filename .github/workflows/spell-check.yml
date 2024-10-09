@@ -47,4 +47,8 @@ jobs:
             ```
             ${{ steps.find_files.outputs.files }}
             ```
+            Errors:
+            ```
+            $(cat result.txt)
+            ```
             Please fix the errors and update the PR.
